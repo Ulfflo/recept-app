@@ -16,6 +16,7 @@ const RecipeDetail = ({ route }) => {
     <View>
       <Text>{recipe.title}</Text>
       <Text>{recipe.ingredients.join(", ")}</Text>
+      <Text>{recipe.directions}</Text>
       <Text>{recipe.cookTime} minutes</Text>
     </View>
   );

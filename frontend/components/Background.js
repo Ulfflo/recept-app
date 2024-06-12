@@ -1,4 +1,3 @@
-// components/Background.js
 import React from "react";
 import { View, ImageBackground, StyleSheet } from "react-native";
 
@@ -17,13 +16,10 @@ const styles = StyleSheet.create({
   background: {
     flex: 1,
     resizeMode: "cover",
-    justifyContent: "center",
   },
   overlay: {
     flex: 1,
     backgroundColor: "rgba(255, 255, 255, 0.7)",
-    justifyContent: "center",
-    alignItems: "center",
     padding: 20,
   },
 });
