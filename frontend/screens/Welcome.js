@@ -13,14 +13,13 @@ import {
 } from "@expo-google-fonts/great-vibes";
 
 const Welcome = ({ navigation }) => {
-  // Load the "Great Vibes" font
   let [fontsLoaded] = useFonts({
     GreatVibes_400Regular,
   });
 
-  // Render the component once the font is loaded
+  
   if (!fontsLoaded) {
-    return null; // You can return a loading indicator here if needed
+    return null; 
   }
 
   return (
@@ -33,7 +32,7 @@ const Welcome = ({ navigation }) => {
           <Image
             source={require("../assets/etikett.png")}
             style={styles.sticker}
-            resizeMode="contain" // Use props.resizeMode instead of style.resizeMode
+            resizeMode="contain" 
           />
           <Text
             style={[
@@ -66,29 +65,29 @@ const styles = StyleSheet.create({
   },
   stickerContainer: {
     position: "absolute",
-    top: "10%", // Adjust this value as needed
+    top: "10%", 
     justifyContent: "center",
     alignItems: "center",
   },
   sticker: {
     width: 320,
-    height: 200, // Adjust the size to fit your sticker image
+    height: 200, 
   },
   stickerText: {
     position: "absolute",
     fontSize: 40,
-    color: "#000", // Change to match your sticker design
+    color: "#000", 
     textAlign: "center",
   },
   button: {
-    backgroundColor: "#1E90FF",
+    backgroundColor: "#4CAF50",
     padding: 10,
     borderRadius: 5,
     width: "50%",
     alignItems: "center",
     justifyContent: "center",
     position: "absolute",
-    bottom: 30, // Adjust this value as needed
+    bottom: 60, 
   },
   buttonText: {
     color: "#fff",

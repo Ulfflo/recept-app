@@ -1,44 +1,41 @@
-import React, { useState, useEffect, useContext } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  FlatList,
-  Pressable,
-} from "react-native";
+import React, { useEffect, useState, useLayoutEffect, useContext } from "react";
+import { View, FlatList, Text, Pressable, StyleSheet } from "react-native";
 import { getRecipes } from "../services/api";
 import Background from "../components/Background";
+import HeaderIcons from "../components/HeaderIcons";
 import UpdatedRecipesContext from "../contexts/UpdatedRecipesContext";
 
-const Search = ({ navigation }) => {
-  const [recipes, setRecipes] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filteredRecipes, setFilteredRecipes] = useState([]);
-
+const Favourite = ({ navigation }) => {
+  const [favorites, setFavorites] = useState([]);
   const { updatedRecipes } = useContext(UpdatedRecipesContext);
-b
-  useEffect(() => {
-    fetchRecipes();
-  }, []);
 
-  useEffect(() => {
-    if (recipes.length > 0 && updatedRecipes) {
-      const mergedRecipes = mergeUpdatedRecipes(recipes, updatedRecipes);
-      setRecipes(mergedRecipes);
-      handleSearch(searchQuery, mergedRecipes); 
-    }
-  }, [updatedRecipes]);
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => <HeaderIcons navigation={navigation} />,
+    });
+  }, [navigation]);
 
-  const fetchRecipes = async () => {
+  const fetchFavorites = async () => {
     try {
       const data = await getRecipes();
-      setRecipes(data);
-      setFilteredRecipes(data);
+      const filteredData = data.filter((recipe) => recipe.favorite);
+      const mergedData = mergeUpdatedRecipes(filteredData, updatedRecipes);
+      setFavorites(mergedData);
     } catch (error) {
       console.error("Error fetching recipes:", error);
     }
   };
+
+  useEffect(() => {
+    fetchFavorites();
+  }, []);
+
+  useEffect(() => {
+    if (favorites.length > 0 && updatedRecipes) {
+      const mergedFavorites = mergeUpdatedRecipes(favorites, updatedRecipes);
+      setFavorites(mergedFavorites);
+    }
+  }, [updatedRecipes]);
 
   const mergeUpdatedRecipes = (recipes, updatedRecipes) => {
     const updatedRecipesArray = Object.values(updatedRecipes);
@@ -53,18 +50,6 @@ b
     return mergedRecipes;
   };
 
-  const handleSearch = (query, recipesToFilter = recipes) => {
-    setSearchQuery(query);
-    if (query.trim() === "") {
-      setFilteredRecipes(recipesToFilter);
-    } else {
-      const filtered = recipesToFilter.filter((recipe) =>
-        recipe.title.toLowerCase().startsWith(query.toLowerCase())
-      );
-      setFilteredRecipes(filtered);
-    }
-  };
-
   const handleNavigate = (item) => {
     navigation.navigate("RecipeDetail", { recipe: item });
   };
@@ -72,14 +57,8 @@ b
   return (
     <Background>
       <View style={styles.container}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search for a recipe..."
-          value={searchQuery}
-          onChangeText={(query) => handleSearch(query)}
-        />
         <FlatList
-          data={filteredRecipes}
+          data={favorites}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
             <View style={styles.recipeItem}>
@@ -91,7 +70,6 @@ b
               </Pressable>
             </View>
           )}
-          contentContainerStyle={{ paddingBottom: 100 }}
         />
       </View>
     </Background>
@@ -102,15 +80,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
-  },
-  searchInput: {
-    height: 40,
-    backgroundColor: "#fff",
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 20,
   },
   recipeItem: {
     flexDirection: "row",
@@ -133,4 +102,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Search;
+export default Favourite;

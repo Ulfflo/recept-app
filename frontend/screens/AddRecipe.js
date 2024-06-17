@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
   TextInput,
@@ -7,7 +7,8 @@ import {
   Pressable,
   FlatList,
 } from "react-native";
-import MultiSelect from "react-native-multiple-select";
+import SectionedMultiSelect from "react-native-sectioned-multi-select";
+import Icon from "react-native-vector-icons/MaterialIcons";
 import { addRecipe } from "../services/api";
 import Background from "../components/Background";
 import { useNavigation } from "@react-navigation/native";
@@ -18,6 +19,7 @@ const AddRecipe = () => {
   const [selectedCourses, setSelectedCourses] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [cookTime, setCookTime] = useState("");
+  const [portions, setPortions] = useState("");
   const [ingredients, setIngredients] = useState("");
   const [directions, setDirections] = useState("");
   const [currentTab, setCurrentTab] = useState("Details");
@@ -30,39 +32,13 @@ const AddRecipe = () => {
       course: selectedCourses,
       category: selectedCategories,
       cookTime: parseInt(cookTime),
+      portions: parseInt(portions),
       ingredients: ingredients.split("\n"),
       directions,
     };
     await addRecipe(newRecipe);
-    navigation.goBack();
+    navigation.navigate("Home");
   };
-
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerTitle: "New Recipe",
-      headerRight: () => (
-        <Pressable onPress={handleSubmit} style={styles.headerButton}>
-          <Text style={styles.headerButtonText}>Add</Text>
-        </Pressable>
-      ),
-      headerLeft: () => (
-        <Pressable
-          onPress={() => navigation.navigate("Home")}
-          style={styles.headerButton}
-        >
-          <Text style={styles.headerButtonText}>Cancel</Text>
-        </Pressable>
-      ),
-    });
-  }, [
-    navigation,
-    title,
-    selectedCourses,
-    selectedCategories,
-    cookTime,
-    ingredients,
-    directions,
-  ]);
 
   const renderDetailsTab = () => (
     <FlatList
@@ -77,53 +53,53 @@ const AddRecipe = () => {
           />
           <TextInput
             style={styles.input}
-            placeholder="Cook time (minutes)"
+            placeholder="Cooking Time (minutes)"
             value={cookTime}
             onChangeText={setCookTime}
             inputMode="numeric"
           />
-          <MultiSelect
+          <TextInput
+            style={styles.input}
+            placeholder="Portions"
+            value={portions}
+            onChangeText={setPortions}
+            inputMode="numeric"
+          />
+          <SectionedMultiSelect
             items={courses}
             uniqueKey="id"
+            selectText="Select Courses"
             onSelectedItemsChange={(selectedItems) =>
               setSelectedCourses(selectedItems)
             }
             selectedItems={selectedCourses}
-            selectText="Courses"
-            tagRemoveIconColor="#007AFF"
-            tagBorderColor="#007AFF"
-            tagTextColor="#007AFF"
-            selectedItemTextColor="#007AFF"
-            selectedItemIconColor="#007AFF"
-            itemTextColor="#000"
-            displayKey="name"
-            submitButtonColor="#007AFF"
-            submitButtonText="Submit"
-            textInputProps={{ editable: false, autoFocus: false }}
-            searchInputPlaceholderText=""
-            searchIcon={false}
+            IconRenderer={Icon}
+            hideSearch={true}
+            colors={{ primary: "#4CAF50" }}
+            styles={{
+              selectToggle: styles.multiSelectToggle,
+              chipContainer: styles.multiSelectChipContainer,
+              chipText: styles.multiSelectChipText,
+            }}
           />
-          <MultiSelect
+          <SectionedMultiSelect
             items={categories}
             uniqueKey="id"
+            selectText="Select Categories"
             onSelectedItemsChange={(selectedItems) =>
               setSelectedCategories(selectedItems)
             }
             selectedItems={selectedCategories}
-            selectText="Categories"
-            tagRemoveIconColor="#007AFF"
-            tagBorderColor="#007AFF"
-            tagTextColor="#007AFF"
-            selectedItemTextColor="#007AFF"
-            selectedItemIconColor="#007AFF"
-            itemTextColor="#000"
-            displayKey="name"
-            submitButtonColor="#007AFF"
-            submitButtonText="Submit"
-            textInputProps={{ editable: false, autoFocus: false }}
-            searchInputPlaceholderText=""
-            searchIcon={false}
+            IconRenderer={Icon}
+            hideSearch={true}
+            colors={{ primary: "#4CAF50" }}
+            styles={{
+              selectToggle: styles.multiSelectToggle,
+              chipContainer: styles.multiSelectChipContainer,
+              chipText: styles.multiSelectChipText,
+            }}
           />
+         
         </View>
       )}
     />
@@ -196,6 +172,11 @@ const AddRecipe = () => {
         {currentTab === "Ingredients" && renderIngredientsTab()}
         {currentTab === "Directions" && renderDirectionsTab()}
       </View>
+      <View style={styles.addButtonContainer}>
+        <Pressable onPress={handleSubmit} style={styles.addButton}>
+          <Text style={styles.addButtonText}>Add Recipe</Text>
+        </Pressable>
+      </View>
     </Background>
   );
 };
@@ -207,10 +188,11 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
   },
   input: {
-    backgroundColor: "white",
-    height: 40,
-    borderColor: "gray",
+    backgroundColor: "#fff",
+    borderRadius: 5,
+    borderColor: "#ccc",
     borderWidth: 1,
+    height: 46,
     marginBottom: 12,
     paddingHorizontal: 8,
     width: "100%",
@@ -219,16 +201,20 @@ const styles = StyleSheet.create({
     height: 200,
     verticalAlign: "top",
   },
-  headerButton: {
-    marginHorizontal: 10,
-    padding: 10,
-    backgroundColor: "#fff",
-    borderRadius: 5,
-    boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+  addButtonContainer: {
+    alignItems: "center",
+    marginBottom: 60,
   },
-  headerButtonText: {
-    color: "#007AFF",
-    fontSize: 16,
+  addButton: {
+    backgroundColor: "#4CAF50",
+    padding: 10,
+    borderRadius: 5,
+    width: "50%",
+    alignItems: "center",
+  },
+  addButtonText: {
+    color: "#fff",
+    fontSize: 18,
   },
   tabContainer: {
     flexDirection: "row",
@@ -240,9 +226,23 @@ const styles = StyleSheet.create({
   },
   activeTabButton: {
     borderBottomWidth: 2,
-    borderBottomColor: "#007AFF",
+    borderBottomColor: "#4CAF50",
   },
   tabButtonText: {
+    fontSize: 16,
+  },
+  multiSelectToggle: {
+    marginBottom: 12,
+    backgroundColor: "#fff",
+    padding: 10,
+    borderRadius: 5,
+  },
+  multiSelectChipContainer: {
+    marginTop: 10,
+    flexDirection: "row",
+    flexWrap: "wrap",
+  },
+  multiSelectChipText: {
     fontSize: 16,
   },
 });

@@ -1,8 +1,23 @@
+import { useLayoutEffect } from "react";
 import React from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import Background from "../components/Background";
+import HeaderIcons from "../components/HeaderIcons";
 
 const Home = ({ navigation }) => {
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => <HeaderIcons navigation={navigation} />,
+    });
+  }, [navigation]);
+
+ useLayoutEffect(() => {
+   navigation.setOptions({
+     headerBackVisible: false,
+   });
+ }, [navigation]);
+
   return (
     <Background>
       <View style={styles.container}>
@@ -10,13 +25,19 @@ const Home = ({ navigation }) => {
           style={styles.button}
           onPress={() => navigation.navigate("RecipeList")}
         >
-          <Text style={styles.buttonText}>View Recipes</Text>
+          <Text style={styles.buttonText}>My Recipes</Text>
         </Pressable>
         <Pressable
           style={styles.button}
-          onPress={() => navigation.navigate("AddRecipe")}
+          onPress={() => navigation.navigate("Favourite")}
         >
-          <Text style={styles.buttonText}>Add a Recipe</Text>
+          <Text style={styles.buttonText}>Favourites</Text>
+        </Pressable>
+        <Pressable
+          style={styles.button}
+          onPress={() => navigation.navigate("UntriedRecipes")}
+        >
+          <Text style={styles.buttonText}>Untried Recipes</Text>
         </Pressable>
       </View>
     </Background>
@@ -25,13 +46,14 @@ const Home = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
   button: {
-    backgroundColor: "#1E90FF",
+    backgroundColor: "#4CAF50",
     padding: 10,
-    marginVertical: 10,
+    marginVertical: 15,
     borderRadius: 5,
     width: "80%",
     alignItems: "center",

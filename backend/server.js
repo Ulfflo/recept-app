@@ -12,21 +12,84 @@ const port = 3000;
 
 const recipesDir = path.resolve("recipes");
 
-// Kontrollera om recipes-mappen finns, annars skapa den
 if (!fs.existsSync(recipesDir)) {
   fs.mkdirSync(recipesDir);
 }
 
-// Skapa ett nytt recept
+const readRecipeFile = (id) => {
+  const filePath = path.join(recipesDir, `${id}.json`);
+  if (fs.existsSync(filePath)) {
+    const content = fs.readFileSync(filePath);
+    return JSON.parse(content);
+  }
+  return null;
+};
+
+app.put("/recipes/:id", (req, res) => {
+  const { id } = req.params;
+  const {
+    title,
+    course,
+    category,
+    cookTime,
+    portions,
+    ingredients,
+    directions,
+    favorite,
+    tried,
+  } = req.body;
+
+  const updatedRecipe = {
+    id,
+    title,
+    course,
+    category,
+    cookTime,
+    portions,
+    ingredients,
+    directions,
+    favorite,
+    tried,
+  };
+
+  const filePath = path.join(recipesDir, `${id}.json`);
+  if (fs.existsSync(filePath)) {
+    fs.writeFileSync(filePath, JSON.stringify(updatedRecipe, null, 2));
+    res.send(updatedRecipe);
+  } else {
+    res.status(404).send({ message: "Recipe not found" });
+  }
+});
+
 app.post("/recipes", (req, res) => {
-  const { title, course, category, cookTime, ingredients, directions } = req.body;
-  const recipe = { id: uuidv4(), title, course, category, cookTime, ingredients, directions };
+  const {
+    title,
+    course,
+    category,
+    cookTime,
+    portions,
+    ingredients,
+    directions,
+    favorite = false,
+    tried = false,
+  } = req.body;
+  const recipe = {
+    id: uuidv4(),
+    title,
+    course,
+    category,
+    cookTime,
+    portions,
+    ingredients,
+    directions,
+    favorite,
+    tried, 
+  };
   const filePath = path.join(recipesDir, `${recipe.id}.json`);
   fs.writeFileSync(filePath, JSON.stringify(recipe, null, 2));
   res.send(recipe);
 });
 
-// Hämta alla recept
 app.get("/recipes", (req, res) => {
   const files = fs.readdirSync(recipesDir);
   const recipes = files.map((file) => {
@@ -36,13 +99,38 @@ app.get("/recipes", (req, res) => {
   res.send(recipes);
 });
 
-// Ta bort ett recept
 app.delete("/recipes/:id", (req, res) => {
   const { id } = req.params;
   const filePath = path.join(recipesDir, `${id}.json`);
   if (fs.existsSync(filePath)) {
     fs.unlinkSync(filePath);
     res.send({ message: "Recipe deleted" });
+  } else {
+    res.status(404).send({ message: "Recipe not found" });
+  }
+});
+
+app.patch("/recipes/:id/favorite", (req, res) => {
+  const { id } = req.params;
+  const filePath = path.join(recipesDir, `${id}.json`);
+  if (fs.existsSync(filePath)) {
+    const recipe = JSON.parse(fs.readFileSync(filePath));
+    recipe.favorite = !recipe.favorite;
+    fs.writeFileSync(filePath, JSON.stringify(recipe, null, 2));
+    res.send(recipe);
+  } else {
+    res.status(404).send({ message: "Recipe not found" });
+  }
+});
+
+app.patch("/recipes/:id/tried", (req, res) => {
+  const { id } = req.params;
+  const filePath = path.join(recipesDir, `${id}.json`);
+  if (fs.existsSync(filePath)) {
+    const recipe = JSON.parse(fs.readFileSync(filePath));
+    recipe.tried = !recipe.tried;
+    fs.writeFileSync(filePath, JSON.stringify(recipe, null, 2));
+    res.send(recipe);
   } else {
     res.status(404).send({ message: "Recipe not found" });
   }

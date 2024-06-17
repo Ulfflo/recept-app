@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useLayoutEffect, useContext } from "react";
 import {
   View,
   FlatList,
@@ -7,123 +7,105 @@ import {
   StyleSheet,
   Image,
 } from "react-native";
-import { getRecipes, deleteRecipe } from "../services/api";
+import { getRecipes } from "../services/api";
 import Background from "../components/Background";
-
-const courses = [
-  {
-    id: "breakfast",
-    name: "Breakfast",
-    image: require("../assets/breakfast.jpg"),
-  },
-  { id: "brunch", name: "Brunch", image: require("../assets/brunch.jpg") },
-  { id: "lunch", name: "Lunch", image: require("../assets/lunch.jpg") },
-  {
-    id: "appetizer",
-    name: "Appetizer",
-    image: require("../assets/appetizer.jpg"),
-  },
-  {
-    id: "main course",
-    name: "Main Course",
-    image: require("../assets/main_course.jpg"),
-  },
-  { id: "dessert", name: "Dessert", image: require("../assets/dessert.jpg") },
-  { id: "snack", name: "Snack", image: require("../assets/snack.jpg") },
-  {
-    id: "beverage",
-    name: "Beverage",
-    image: require("../assets/beverage.jpg"),
-  },
-];
-
-const categories = [
-  { id: "bread", name: "Bread", image: require("../assets/bread.jpg") },
-  {
-    id: "vegetarian",
-    name: "Vegetarian",
-    image: require("../assets/vegetarian.jpg"),
-  },
-  { id: "vegan", name: "Vegan", image: require("../assets/vegan.jpg") },
-  {
-    id: "gluten-free",
-    name: "Gluten-Free",
-    image: require("../assets/gluten_free.jpg"),
-  },
-  {
-    id: "dairy-free",
-    name: "Dairy-Free",
-    image: require("../assets/dairy_free.jpg"),
-  },
-  {
-    id: "low-carb",
-    name: "Low-Carb",
-    image: require("../assets/low_carb.jpg"),
-  },
-  { id: "soup", name: "Soup", image: require("../assets/soup.jpg") },
-  { id: "salad", name: "Salad", image: require("../assets/salad.jpg") },
-  { id: "pasta", name: "Pasta", image: require("../assets/pasta.jpg") },
-  { id: "rice", name: "Rice", image: require("../assets/rice.jpg") },
-  { id: "seafood", name: "Seafood", image: require("../assets/seafood.jpg") },
-  { id: "fish", name: "Fish", image: require("../assets/fish.jpg") },
-  { id: "chicken", name: "Chicken", image: require("../assets/chicken.jpg") },
-  { id: "pork", name: "Pork", image: require("../assets/pork.jpg") },
-  { id: "lamb", name: "Lamb", image: require("../assets/lamb.jpg") },
-  { id: "beef", name: "Beef", image: require("../assets/beef.jpg") },
-  {
-    id: "beverage",
-    name: "Beverage",
-    image: require("../assets/beverage.jpg"),
-  },
-];
-
-
+import { courses, categories } from "../constants/data";
+import HeaderIcons from "../components/HeaderIcons";
+import UpdatedRecipesContext from "../contexts/UpdatedRecipesContext"; // Import the context
 
 const RecipeList = ({ navigation }) => {
   const [recipes, setRecipes] = useState([]);
-  const [currentTab, setCurrentTab] = useState("All");
-  const [selectedCourses, setSelectedCourses] = useState([]);
-  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [currentTab, setCurrentTab] = useState("Courses");
+  const [sortingCriteria, setSortingCriteria] = useState("title");
 
-  useEffect(() => {
-    const fetchRecipes = async () => {
+  const { updatedRecipes } = useContext(UpdatedRecipesContext); // Use the context
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => <HeaderIcons navigation={navigation} />,
+    });
+  }, [navigation]);
+
+  const fetchRecipes = async () => {
+    try {
       const data = await getRecipes();
       setRecipes(data);
-    };
+    } catch (error) {
+      console.error("Error fetching recipes:", error);
+    }
+  };
+
+  useEffect(() => {
     fetchRecipes();
   }, []);
 
-  const handleDelete = async (id) => {
-    await deleteRecipe(id);
-    setRecipes(recipes.filter((recipe) => recipe.id !== id));
-  };
+  useEffect(() => {
+    if (recipes.length > 0 && updatedRecipes) {
+      const mergedRecipes = mergeUpdatedRecipes(recipes, updatedRecipes);
+      setRecipes(mergedRecipes);
+    }
+  }, [updatedRecipes]);
 
   const handleNavigate = (item) => {
     navigation.navigate("RecipeDetail", { recipe: item });
   };
 
-  const filterRecipes = () => {
-    return recipes.filter((recipe) => {
-      const courseMatch =
-        selectedCourses.length === 0 ||
-        recipe.course.some((course) => selectedCourses.includes(course));
-      const categoryMatch =
-        selectedCategories.length === 0 ||
-        recipe.category.some((category) =>
-          selectedCategories.includes(category)
-        );
-      return courseMatch && categoryMatch;
+  const mergeUpdatedRecipes = (recipes, updatedRecipes) => {
+    const updatedRecipesArray = Object.values(updatedRecipes);
+    const mergedRecipes = recipes.map((recipe) =>
+      updatedRecipes[recipe.id] ? updatedRecipes[recipe.id] : recipe
+    );
+    updatedRecipesArray.forEach((updatedRecipe) => {
+      if (!mergedRecipes.find((recipe) => recipe.id === updatedRecipe.id)) {
+        mergedRecipes.push(updatedRecipe);
+      }
+    });
+    return mergedRecipes;
+  };
+
+
+  const filterRecipesByCourse = (course) => {
+   
+    return recipes.filter(
+      (recipe) => course && recipe.course && recipe.course.includes(course.id)
+    );
+  };
+
+  const filterRecipesByCategory = (category) => {
+ 
+    return recipes.filter(
+      (recipe) =>
+        category && recipe.category && recipe.category.includes(category.id)
+    );
+  };
+
+
+  const handleCourseSelect = (course) => {
+    const filteredRecipes = filterRecipesByCourse(course);
+    navigation.navigate("RecipeListByCategoryOrCourse", {
+      headerTitle: course.name,
+      filteredRecipes,
+      image: course.image, // Pass the image source
     });
   };
 
-  const handleCourseSelect = (course) => {
-    setSelectedCourses([course.id]);
-    setCurrentTab("Favourites");
+  const handleCategorySelect = (category) => {
+    const filteredRecipes = filterRecipesByCategory(category);
+    navigation.navigate("RecipeListByCategoryOrCourse", {
+      headerTitle: category.name,
+      filteredRecipes,
+      image: category.image, // Pass the image source
+    });
   };
 
-  const handleCategorySelect = (category) => {
-    setSelectedCategories([category.id]);
-    setCurrentTab("Favourites");
+  const sortRecipes = (recipes, criteria) => {
+    return [...recipes].sort((a, b) => {
+      if (criteria === "title") {
+        return a.title.localeCompare(b.title);
+      } else if (criteria === "time") {
+        return a.cookTime - b.cookTime;
+      }
+    });
   };
 
   const renderCoursesTab = () => (
@@ -157,27 +139,44 @@ const RecipeList = ({ navigation }) => {
     />
   );
 
-  const renderFavouritesTab = () => (
-    <FlatList
-      data={filterRecipes()}
-      keyExtractor={(item) => item.id.toString()}
-      renderItem={({ item }) => (
-        <View style={styles.recipeItem}>
-          <Pressable
-            style={styles.recipeDetail}
-            onPress={() => handleNavigate(item)}
-          >
-            <Text style={styles.recipeTitle}>{item.title}</Text>
-          </Pressable>
-          <Pressable
-            style={styles.deleteButton}
-            onPress={() => handleDelete(item.id)}
-          >
-            <Text style={styles.deleteButtonText}>Delete</Text>
-          </Pressable>
-        </View>
-      )}
-    />
+  const renderAllTab = () => (
+    <>
+      <View style={styles.sortingButtonsContainer}>
+        <Pressable
+          style={[
+            styles.sortingButton,
+            sortingCriteria === "title" && styles.activeSortingButton,
+          ]}
+          onPress={() => setSortingCriteria("title")}
+        >
+          <Text style={styles.sortingButtonText}>Sort by Title</Text>
+        </Pressable>
+        <Pressable
+          style={[
+            styles.sortingButton,
+            sortingCriteria === "time" && styles.activeSortingButton,
+          ]}
+          onPress={() => setSortingCriteria("time")}
+        >
+          <Text style={styles.sortingButtonText}>Sort by Cooking Time</Text>
+        </Pressable>
+      </View>
+      <FlatList
+        data={sortRecipes(recipes, sortingCriteria)}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => (
+          <View style={styles.recipeItem}>
+            <Pressable
+              style={styles.recipeDetail}
+              onPress={() => handleNavigate(item)}
+            >
+              <Text style={styles.recipeTitle}>{item.title}</Text>
+            </Pressable>
+          </View>
+        )}
+        contentContainerStyle={{ paddingBottom: 100 }} // Add padding to avoid overlap
+      />
+    </>
   );
 
   return (
@@ -203,10 +202,10 @@ const RecipeList = ({ navigation }) => {
             <Text style={styles.tabButtonText}>Categories</Text>
           </Pressable>
           <Pressable
-            onPress={() => setCurrentTab("Favourites")}
+            onPress={() => setCurrentTab("All")}
             style={[
               styles.tabButton,
-              currentTab === "Favourites" && styles.activeTabButton,
+              currentTab === "All" && styles.activeTabButton,
             ]}
           >
             <Text style={styles.tabButtonText}>All</Text>
@@ -215,14 +214,7 @@ const RecipeList = ({ navigation }) => {
 
         {currentTab === "Courses" && renderCoursesTab()}
         {currentTab === "Categories" && renderCategoriesTab()}
-        {currentTab === "Favourites" && renderFavouritesTab()}
-
-        <Pressable
-          style={styles.addButton}
-          onPress={() => navigation.navigate("AddRecipe")}
-        >
-          <Text style={styles.addButtonText}>Add Recipe</Text>
-        </Pressable>
+        {currentTab === "All" && renderAllTab()}
       </View>
     </Background>
   );
@@ -232,6 +224,40 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
+  },
+  tabContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginBottom: 16,
+  },
+  tabButton: {
+    padding: 10,
+  },
+  activeTabButton: {
+    borderBottomWidth: 2,
+    borderBottomColor: "#4CAF50",
+  },
+  tabButtonText: {
+    fontSize: 16,
+  },
+  sortingButtonsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginBottom: 16,
+  },
+  sortingButton: {
+    padding: 10,
+    borderWidth: 1,
+    borderColor: "#fff",
+    backgroundColor: "#fff",
+    borderRadius: 5,
+  },
+  activeSortingButton: {
+    borderColor: "#4CAF50",
+  },
+  sortingButtonText: {
+    fontSize: 16,
+    color: "#4CAF50",
   },
   recipeItem: {
     flexDirection: "row",
@@ -245,49 +271,14 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 10,
     paddingHorizontal: 15,
-    backgroundColor: "#e0e0e0",
-    marginRight: 10,
+    backgroundColor: "#4CAF50",
     borderRadius: 5,
   },
   recipeTitle: {
     fontSize: 18,
-    color: "#333",
-  },
-  deleteButton: {
-    backgroundColor: "#ff6666",
-    padding: 10,
-    borderRadius: 5,
-  },
-  deleteButtonText: {
     color: "#fff",
-    fontWeight: "bold",
   },
-  addButton: {
-    backgroundColor: "#4CAF50",
-    padding: 15,
-    borderRadius: 5,
-    marginTop: 20,
-    alignItems: "center",
-  },
-  addButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
-  tabContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginBottom: 16,
-  },
-  tabButton: {
-    padding: 10,
-  },
-  activeTabButton: {
-    borderBottomWidth: 2,
-    borderBottomColor: "#007AFF",
-  },
-  tabButtonText: {
-    fontSize: 16,
-  },
+
   card: {
     flex: 1,
     margin: 10,
