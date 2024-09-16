@@ -1,0 +1,28 @@
+{
+  "id": "40ae9c22-d789-4db1-a361-24e2ed2104ce",
+  "title": "Korv stroganoff med ris",
+  "course": [
+    "main course"
+  ],
+  "category": [
+    "rice",
+    "pork",
+    "beef"
+  ],
+  "cookTime": null,
+  "portions": 4,
+  "ingredients": [
+    "4   port ris",
+    "550 g  falukorv",
+    "1   gul lök",
+    "1 msk  olja",
+    "3 msk  tomatpuré",
+    "2 1/2 dl  matlagningsgrädde",
+    "1 dl  mjölk",
+    "1 msk  japansk soja",
+    "1 tsk  dijonsenap",
+    "peppar",
+    "salt"
+  ],
+  "directions": "Koka riset enligt anvisningen på förpackningen.\n\nSkär korven i stavar. Skala och hacka löken.\n\nStek korv och lök i oljan i en stekpanna ca 5 minuter. Tillsätt tomatpuré och fräs någon minut.\n\nRör ner grädde, mjölk, soja och dijonsenap. Låt sjuda ca 5 minuter.\n\nSmaka av med peppar och ev salt.\n\nTill servering: Servera korvstroganoffen med ris och gärna vitkålssallad."
+}

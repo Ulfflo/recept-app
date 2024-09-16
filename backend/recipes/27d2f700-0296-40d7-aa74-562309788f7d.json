@@ -1,0 +1,23 @@
+{
+  "id": "27d2f700-0296-40d7-aa74-562309788f7d",
+  "title": "Pasta carbonara ",
+  "course": [
+    "main course",
+    "lunch"
+  ],
+  "category": [
+    "pasta",
+    "pork"
+  ],
+  "cookTime": 20,
+  "portions": 4,
+  "ingredients": [
+    "320 g spagetti",
+    "240 g pancetta, eler bacon skuren i bitar",
+    "100 g riven parmesanost",
+    "4 äggulor",
+    "olivolja",
+    "salt och svartpeppar"
+  ],
+  "directions": "Koka pastan enligt anvisning på förpackningen. Spara lite av kokvattnet.\nStek pancettan eller baconet.\nBlanda äggulor och ost med lite avsvalnat pastavatten.\nVänd ner pastan i stekpannan med pancettan och rör ner ägg- och ostblandningen på låg värme. Späd med mer pastavatten för en krämig konsistens.\nSmaka av med salt och svartpeppar och toppa med olivolja och riven parmesan."
+}

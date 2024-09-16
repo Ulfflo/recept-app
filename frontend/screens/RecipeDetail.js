@@ -17,6 +17,7 @@ import {
 } from "../services/api";
 import UntriedRecipesContext from "../contexts/UntriedRecipesContext";
 import UpdatedRecipesContext from "../contexts/UpdatedRecipesContext"; // Import the new context
+import { categories } from "../constants/data";
 
 const RecipeDetail = ({ route }) => {
   const { recipe } = route.params;
@@ -29,6 +30,8 @@ const RecipeDetail = ({ route }) => {
     title: recipe.title || "",
     cookTime: recipe.cookTime || "",
     portions: recipe.portions || "",
+    category: recipe.category || [],
+    course: recipe.course || [],
     ingredients: recipe.ingredients || [],
     directions: recipe.directions || "",
   }); // Copy of original recipe
@@ -195,7 +198,7 @@ const RecipeDetail = ({ route }) => {
                 cookTime: parseInt(text) || "",
               })
             }
-            placeholder="Cooking Time"
+            placeholder="Cooking Time (minutes)"
             keyboardType="numeric"
           />
           <TextInput

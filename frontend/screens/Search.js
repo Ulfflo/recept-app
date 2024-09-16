@@ -17,7 +17,7 @@ const Search = ({ navigation }) => {
   const [filteredRecipes, setFilteredRecipes] = useState([]);
 
   const { updatedRecipes } = useContext(UpdatedRecipesContext);
-b
+
   useEffect(() => {
     fetchRecipes();
   }, []);

@@ -1,0 +1,32 @@
+{
+  "id": "333a212f-8edc-4a5a-a5bc-b64ae0765d1d",
+  "title": "Spaghetti bolognese ",
+  "course": [
+    "main course",
+    "lunch"
+  ],
+  "category": [
+    "pasta",
+    "beef"
+  ],
+  "cookTime": null,
+  "portions": 4,
+  "ingredients": [
+    "1   morot",
+    "1   gul lök",
+    "ca 500 g  nötfärs eller blandfärs",
+    "1 msk  olivolja",
+    "2 tsk  torkad oregano",
+    "1   förp krossade tomater med vitlök (à 390 g)",
+    "3 dl  vatten",
+    "2 msk  tomatpuré",
+    "1/2 msk  japansk soja",
+    "1   Knorr köttbuljongtärning",
+    "salt",
+    "peppar",
+    "4   port spaghetti",
+    "65 g  rucola eller annan grön sallad"
+  ],
+  "directions": "Sätt på en stor kastrull med vatten till spaghettin.\n\nSkala och riv moroten grovt på ett rivjärn. Skala och hacka löken.\n\nBryn färsen i olivoljan i en stor kastrull eller stekpanna med höga kanter. Blanda i morot och lök och låt fräsa ca 3 minuter.\n\nBlanda ner oregano, krossade tomater, vatten, tomatpuré, soja och smulad buljongtärning.\n\nSänk värmen och låt såsen sjuda ca 10 minuter under lock. Smaka av med salt och peppar.\n\nKoka pastan enligt anvisningen på förpackningen.\n\nServera köttfärssåsen med spaghetti och ruccola.",
+  "tried": true
+}
